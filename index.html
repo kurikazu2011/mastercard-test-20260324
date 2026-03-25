@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FX Opportunity Dashboard</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #111827;
+            --panel-2: #1f2937;
+            --border: #243244;
+            --text: #e5e7eb;
+            --muted: #94a3b8;
+            --green: #22c55e;
+            --red: #ef4444;
+            --amber: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(180deg, #081224 0%, #0f172a 100%);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 18px;
+        }
+
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .title-row h1 {
+            margin: 0;
+            font-size: 32px;
+            line-height: 1.15;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .card {
+            background: rgba(17, 24, 39, 0.96);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
+        }
+
+        .card h3 {
+            margin: 0 0 10px 0;
+            color: #dbe5f0;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .small {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .metric {
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 6px 0;
+            word-break: break-word;
+        }
+
+        .opportunity-good {
+            background: linear-gradient(135deg, rgba(20, 83, 45, 0.95), rgba(22, 101, 52, 0.95));
+            border: 1px solid rgba(34, 197, 94, 0.7);
+        }
+
+        .opportunity-bad {
+            background: linear-gradient(135deg, rgba(76, 5, 25, 0.95), rgba(127, 29, 29, 0.95));
+            border: 1px solid rgba(239, 68, 68, 0.7);
+        }
+
+        .opportunity-label {
+            font-size: 13px;
+            color: #ecf3ff;
+            text-transform: uppercase;
+            letter-spacing: 1.3px;
+        }
+
+        .opportunity-value {
+            font-size: 48px;
+            font-weight: 900;
+            margin-top: 8px;
+            line-height: 1;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .table-card {
+            margin-bottom: 18px;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 500px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        table {
+            width: 100%;
+            min-width: 760px;
+            border-collapse: collapse;
+            overflow: hidden;
+        }
+
+        thead th {
+            background: #1d293b;
+            color: #d7e2ee;
+            font-size: 13px;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        tbody td {
+            padding: 12px;
+            border-bottom: 1px solid #1f2937;
+            font-size: 14px;
+            color: var(--text);
+            vertical-align: top;
+        }
+
+        tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .footer-note {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 11px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-yes {
+            background: rgba(34, 197, 94, 0.18);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.45);
+        }
+
+        .badge-no {
+            background: rgba(239, 68, 68, 0.18);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.45);
+        }
+
+        .error-box {
+            background: rgba(69, 26, 3, 0.95);
+            border: 1px solid var(--amber);
+            color: #fde68a;
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .meta-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .meta-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 980px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .meta-row {
+                grid-template-columns: 1fr;
+            }
+
+            .title-row {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 12px;
+            }
+
+            .title-row h1 {
+                font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .card {
+                padding: 14px;
+                border-radius: 16px;
+            }
+
+            .metric {
+                font-size: 24px;
+            }
+
+            .opportunity-value {
+                font-size: 40px;
+            }
+
+            .opportunity-label {
+                font-size: 12px;
+            }
+
+            .small {
+                font-size: 12px;
+            }
+
+            .card h3 {
+                font-size: 14px;
+            }
+
+            .table-scroll {
+                max-height: 400px;
+            }
+
+            thead th,
+            tbody td {
+                font-size: 11px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-row">
+            <div>
+                <h1>FX Opportunity Dashboard</h1>
+                <div class="subtitle">
+                    This page reads historical data from the central SQLite database file:
+                    <br>C:\Users\kurik_2r3y0de\AppData\Local\Programs\Microsoft VS Code\fx_rates.db
+                    <br>Auto-fetch runs every 30 minutes while this app is running.
+                    The page refreshes every 60 seconds.
+                </div>
+            </div>
+            <div class="small">
+                Last dashboard refresh:<br>2026-03-25 01:22:02 UTC
+            </div>
+        </div>
+
+        
+
+        <div class="grid">
+            <div class="card opportunity-bad">
+                <div class="opportunity-label">Current Opportunity</div>
+                <div class="opportunity-value">
+                    
+                        NO
+                    
+                </div>
+                <div class="small">
+                    
+                        Mastercard <= Yahoo: False
+                    
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Latest Mastercard Rate</h3>
+                <div class="metric">
+                    158.980000
+                </div>
+                <div class="small">
+                    2026-03-25 01:22:01 UTC
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Latest Yahoo Rate</h3>
+                <div class="metric">
+                    158.651993
+                </div>
+                <div class="small">
+                    2026-03-25 01:22:01 UTC
+                </div>
+            </div>
+
+            <div class="card opportunity-bad">
+                <h3>Latest Difference</h3>
+                <div class="metric">
+                    +0.328007
+                </div>
+                <div class="small">Mastercard minus Yahoo</div>
+            </div>
+        </div>
+
+        <div class="meta-row">
+            <div class="card">
+                <h3>Latest Snapshot Time</h3>
+                <div class="meta-value">
+                    2026-03-25 01:22:01 UTC
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Total Valid Snapshots</h3>
+                <div class="meta-value">3</div>
+            </div>
+
+            <div class="card">
+                <h3>Database File</h3>
+                <div class="small" style="word-break: break-all; margin-top: 6px;">C:\Users\kurik_2r3y0de\AppData\Local\Programs\Microsoft VS Code\fx_rates.db</div>
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <h3>Snapshot History</h3>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fetched At (UTC)</th>
+                            <th>Mastercard Rate</th>
+                            <th>Yahoo Rate</th>
+                            <th>Difference</th>
+                            <th>Opportunity</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>2026-03-25 01:22:01</td>
+                            <td>
+                                
+                                    158.980000
+                                
+                            </td>
+                            <td>
+                                
+                                    158.651993
+                                
+                            </td>
+                            <td>
+                                
+                                    +0.328007
+                                
+                            </td>
+                            <td>
+                                
+                                    
+                                        <span class="badge badge-no">NO</span>
+                                    
+                                
+                            </td>
+                            <td>
+                                
+                                    OK
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>2026-03-25 01:21:52</td>
+                            <td>
+                                
+                                    158.980000
+                                
+                            </td>
+                            <td>
+                                
+                                    158.645996
+                                
+                            </td>
+                            <td>
+                                
+                                    +0.334004
+                                
+                            </td>
+                            <td>
+                                
+                                    
+                                        <span class="badge badge-no">NO</span>
+                                    
+                                
+                            </td>
+                            <td>
+                                
+                                    OK
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>2026-03-25 01:21:36</td>
+                            <td>
+                                
+                                    158.980000
+                                
+                            </td>
+                            <td>
+                                
+                                    158.658997
+                                
+                            </td>
+                            <td>
+                                
+                                    +0.321003
+                                
+                            </td>
+                            <td>
+                                
+                                    
+                                        <span class="badge badge-no">NO</span>
+                                    
+                                
+                            </td>
+                            <td>
+                                
+                                    OK
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="footer-note">
+                This table shows stored snapshot records from the central database file, including data collected before the program was restarted.
+                Showing the latest 3 rows.
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</body>
+</html>
